@@ -8,8 +8,12 @@ class Session {
   int get durationSec => (endMs - startMs) ~/ 1000;
 
   @override
-  bool operator ==(Object o) =>
-      o is Session && o.package == package && o.appName == appName && o.startMs == startMs && o.endMs == endMs;
+  bool operator ==(Object other) =>
+      other is Session &&
+      other.package == package &&
+      other.appName == appName &&
+      other.startMs == startMs &&
+      other.endMs == endMs;
 
   @override
   int get hashCode => Object.hash(package, appName, startMs, endMs);
