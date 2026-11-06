@@ -74,7 +74,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> with WidgetsBinding
                   _p.battery, requestBattery),
               const SizedBox(height: 20),
               FilledButton(
-                onPressed: _p.usage && _p.notifications ? _continue : null,
+                // Only usage access is required: Android stops showing the notification prompt after
+                // two denials, and the home screen already shows a banner when nudges are off.
+                onPressed: _p.usage ? _continue : null,
                 child: const Text('Continue'),
               ),
             ],

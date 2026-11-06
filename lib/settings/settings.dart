@@ -20,6 +20,7 @@ bool isInBedtime(DateTime now, Bedtime b) {
 /// Start/end ms of the bedtime window that starts on [day].
 (int, int) bedtimeWindowFor(DateTime day, Bedtime b) {
   final start = DateTime(day.year, day.month, day.day, 0, b.startMin);
+  if (b.startMin == b.endMin) return (start.millisecondsSinceEpoch, start.millisecondsSinceEpoch); // matches isInBedtime: never
   final endDay = b.endMin <= b.startMin ? day.day + 1 : day.day;
   final end = DateTime(day.year, day.month, endDay, 0, b.endMin);
   return (start.millisecondsSinceEpoch, end.millisecondsSinceEpoch);

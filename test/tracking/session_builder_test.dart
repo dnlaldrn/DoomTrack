@@ -15,6 +15,7 @@ List<Session> b(List<UsageEvent> e, {int end = 10000, Set<String>? only}) =>
     buildSessions(e, windowEndMs: end * 1000, appNames: const {}, onlyPackages: only);
 
 void main() {
+  reviewFixes();
   test('normal pair', () => expect(b([fg(IG, 0), bg(IG, 60)]).single, sess(IG, 0, 60)));
   test('second app foreground closes first', () {
     expect(b([fg(IG, 0), fg(TT, 100), bg(TT, 160)]), [sess(IG, 0, 100), sess(TT, 100, 160)]);
@@ -33,4 +34,15 @@ void main() {
   });
   test('appName falls back to package', () => expect(b([fg('x.y', 0), bg('x.y', 5)]).single.appName, 'x.y'));
   test('durationSec', () => expect(sess(IG, 0, 61).durationSec, 61));
+}
+
+void reviewFixes() {
+  test('merges across a short hop to an untracked app', () {
+    const wa = 'com.whatsapp';
+    expect(b([fg(IG, 0), fg(wa, 60), fg(IG, 70), bg(IG, 200)], only: {IG}).single, sess(IG, 0, 200));
+  });
+  test('long hop to an untracked app keeps sessions split', () {
+    const wa = 'com.whatsapp';
+    expect(b([fg(IG, 0), fg(wa, 60), fg(IG, 100), bg(IG, 200)], only: {IG}).length, 2);
+  });
 }

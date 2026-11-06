@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  reviewFixes();
   const b = Bedtime(23 * 60, 6 * 60);
   test('inside before midnight', () => expect(isInBedtime(DateTime(2026, 11, 6, 23, 30), b), isTrue));
   test('inside after midnight', () => expect(isInBedtime(DateTime(2026, 11, 7, 5, 59), b), isTrue));
@@ -37,5 +38,12 @@ void main() {
     final s = await SettingsStore.load();
     expect((s.bedtime.startMin, s.bedtime.endMin, s.limitMin, s.demoMode), (1320, 420, 15, true));
     expect(s.tracked, {'a'});
+  });
+}
+
+void reviewFixes() {
+  test('equal start/end gives an empty window', () {
+    final (start, end) = bedtimeWindowFor(DateTime(2026, 11, 5), const Bedtime(1380, 1380));
+    expect(end, start);
   });
 }

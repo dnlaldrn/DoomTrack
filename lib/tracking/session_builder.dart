@@ -36,9 +36,11 @@ List<Session> buildSessions(
   }
   close(windowEndMs);
 
-  // Merge before filtering, so an untracked app in between keeps sessions apart.
+  // Filter before merging: leaving an app always foregrounds another one (launcher, a quick
+  // reply), so a short hop must not split the tracked session. Up to 30 s of the other app's
+  // time is attributed to the tracked one.
   final merged = <(String, int, int)>[];
-  for (final s in raw) {
+  for (final s in raw.where((s) => onlyPackages == null || onlyPackages.contains(s.$1))) {
     final last = merged.isEmpty ? null : merged.last;
     if (last != null && last.$1 == s.$1 && s.$2 - last.$3 < kMergeGapMs) {
       merged[merged.length - 1] = (last.$1, last.$2, s.$3);
@@ -47,8 +49,5 @@ List<Session> buildSessions(
     }
   }
 
-  return [
-    for (final (pkg, start, end) in merged)
-      if (onlyPackages == null || onlyPackages.contains(pkg)) Session(pkg, appNames[pkg] ?? pkg, start, end),
-  ];
+  return [for (final (pkg, start, end) in merged) Session(pkg, appNames[pkg] ?? pkg, start, end)];
 }

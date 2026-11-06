@@ -8,6 +8,17 @@ import 'session_builder.dart';
 import 'tracked_apps.dart';
 import 'usage_source.dart';
 
+const kSyncOverlapMs = 10 * 60 * 1000;
+const _maxBackMs = 7 * 24 * 3600 * 1000;
+
+/// Where the next import starts. Re-reads the last 10 minutes, extended back to the start of any
+/// stored session reaching into that overlap, so a rebuilt session keeps its start_ms and replaces
+/// its row instead of being inserted again. [overlapStart] = MIN(start_ms) of those sessions.
+int syncFrom({required int now, required int? lastSync, required int? overlapStart}) {
+  if (lastSync == null) return now - _maxBackMs;
+  return max(min(overlapStart ?? lastSync, lastSync - kSyncOverlapMs), now - _maxBackMs);
+}
+
 class SyncResult {
   final int imported;
   final bool possibleGap;
@@ -32,12 +43,11 @@ class UsageRepository {
     final prefs = await SharedPreferences.getInstance();
     final now = DateTime.now().millisecondsSinceEpoch;
     final last = prefs.getInt('lastSync');
-    // Re-read from the start of any session still open at the last sync (its end == lastSync),
-    // so it gets replaced with its real end; otherwise a 10-minute overlap.
-    final open = last == null
+    final overlapStart = last == null
         ? null
-        : Sqflite.firstIntValue(await _db.rawQuery('SELECT MIN(start_ms) FROM sessions WHERE end_ms = ?', [last]));
-    final from = max(min(open ?? now, (last ?? 0) - 10 * 60 * 1000), now - 7 * 24 * 3600 * 1000);
+        : Sqflite.firstIntValue(
+            await _db.rawQuery('SELECT MIN(start_ms) FROM sessions WHERE end_ms > ?', [last - kSyncOverlapMs]));
+    final from = syncFrom(now: now, lastSync: last, overlapStart: overlapStart);
     final sessions = buildSessions(await queryEvents(from, now),
         windowEndMs: now, appNames: kDefaultTrackedApps, onlyPackages: tracked);
 

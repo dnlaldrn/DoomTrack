@@ -7,6 +7,7 @@ Session sessAt(DateTime a, DateTime b, [String app = 'IG']) =>
 Session sessMs(int a, int b, [String app = 'IG']) => Session(app, app, a, b);
 
 void main() {
+  reviewFixes();
   test('session crossing midnight splits across days', () {
     // 23:50 → 00:20 on Nov 5/6
     expect(secondsPerDay([sessAt(DateTime(2026, 11, 5, 23, 50), DateTime(2026, 11, 6, 0, 20))], DateTime(2026, 11, 5), 2),
@@ -27,5 +28,12 @@ void main() {
   });
   test('topApps respects limit', () {
     expect(topApps([sessMs(0, 1000, 'A'), sessMs(0, 2000, 'B')], limit: 1).single.key, 'B');
+  });
+}
+
+void reviewFixes() {
+  test('clipSessions trims to the window and drops outside ones', () {
+    final r = clipSessions([sessMs(0, 100000), sessMs(200000, 300000), sessMs(500000, 600000)], 50000, 250000);
+    expect(r.map((s) => (s.startMs, s.endMs)).toList(), [(50000, 100000), (200000, 250000)]);
   });
 }

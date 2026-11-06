@@ -61,7 +61,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       final sessions = await repo.sessionsBetween(first.millisecondsSinceEpoch, now.millisecondsSinceEpoch);
       final todays = await repo.sessionsBetween(today.millisecondsSinceEpoch, now.millisecondsSinceEpoch);
       final (bedStart, bedEnd) = bedtimeWindowFor(DateTime(today.year, today.month, today.day - 1), settings.bedtime);
-      final r = _Report(secondsPerDay(sessions, first, 7), topApps(todays), secondsInWindow(sessions, bedStart, bedEnd), perms, gap);
+      // Clip so a session from before midnight doesn't make top apps exceed today's total.
+      final todayClipped = clipSessions(todays, today.millisecondsSinceEpoch, now.millisecondsSinceEpoch);
+      final r = _Report(secondsPerDay(sessions, first, 7), topApps(todayClipped), secondsInWindow(sessions, bedStart, bedEnd), perms, gap);
       if (mounted) setState(() => (_r = r, _error = null));
     } catch (e) {
       if (mounted) setState(() => _error = e);

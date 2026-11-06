@@ -21,6 +21,13 @@ List<int> secondsPerDay(List<Session> s, DateTime firstDay, int days) => [
         ),
     ];
 
+/// Sessions trimmed to [startMs, endMs); ones fully outside are dropped.
+List<Session> clipSessions(List<Session> s, int startMs, int endMs) => [
+      for (final x in s)
+        if (x.endMs > startMs && x.startMs < endMs)
+          Session(x.package, x.appName, max(x.startMs, startMs), min(x.endMs, endMs)),
+    ];
+
 /// appName → seconds, most used first.
 List<MapEntry<String, int>> topApps(List<Session> s, {int limit = 3}) {
   final totals = <String, int>{};

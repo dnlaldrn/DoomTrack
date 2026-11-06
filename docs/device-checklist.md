@@ -19,6 +19,8 @@ Phone 1: ____________ (brand/model, Android version)  Phone 2: ____________
 | 4.3 | Nudge | Leave Instagram over 30 s, reopen: one new nudge | | |
 | 4.4 | Nudge | Demo mode off, bedtime set to exclude now: no nudge after 2 min in Instagram | | |
 | 4.5 | Nudge | Demo off, bedtime includes now, limit 5 min: nudge at ~5 min (checks the real limit, not just demo mode) | | |
+| 4.6 | Nudge | Demo mode on, Instagram open: within 15 s of the nudge, turn demo mode off and set limit 60. Start a new Instagram session: no nudge at 30 s (the watcher picked up the change) | | |
+| 4.7 | Nudge | Hop from Instagram to WhatsApp for ~5 s and back, in demo mode: still only one nudge for that session | | |
 | 5.1 | Breathing | DoomTrack in background, tap the nudge: Breathing opens, ends on Activities after 60 s | | |
 | 5.2 | Breathing | Swipe DoomTrack away from recents, trigger a nudge, tap it: Breathing opens | | |
 | 5.3 | Breathing | Skip goes straight to Activities; Done closes Activities | | |

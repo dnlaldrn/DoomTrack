@@ -60,7 +60,7 @@ Future<void> startWatcher() async {
     foregroundTaskOptions: ForegroundTaskOptions(
       eventAction: ForegroundTaskEventAction.repeat(15000),
       autoRunOnBoot: true,
-      allowWakeLock: true,
+      allowWakeLock: false, // scrolling keeps the screen (and CPU) on; a 24/7 lock only drains battery
     ),
   );
   if (await FlutterForegroundTask.isRunningService) return;
